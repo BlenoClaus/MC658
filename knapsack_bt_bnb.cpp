@@ -40,6 +40,23 @@ void printVector(vector<int> v){
 	cout << endl;
 }
 
+void bt_solution(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k,  int &curBstValue, vector<int> &curBstSol){
+
+	if ( k < n){
+		int solTemp = checkSolution(sol, p, w, c, B, d);
+		if ( solTemp > -1){
+			if ( solTemp > curBstValue){
+				curBstValue = solTemp;
+				curBstSol = sol;
+			}		
+			sol[k] = 0;
+			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
+			sol[k] = 1;
+			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
+		}
+	}
+}
+
 ///
 // Bactracking function: 
 ///
@@ -49,7 +66,12 @@ bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vec
 	vector<int> curBstSol(sol.size(), 0);
 	fill(sol.begin(), sol.end(), 0);
 	
-	for(int i = 0; i < n; i++){
+	
+	bt_solution(n, d, B, p, w, c, sol, t, 0, curBstValue, curBstSol);
+	
+	//sol = curBstValue;
+	
+	/*for(int i = 0; i < n; i++){
 		sol[i] = 1;
 		int aux = checkSolution(sol, w, c, B, d);
 		if(aux > -1){
@@ -64,13 +86,13 @@ bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vec
 		bt(n,d,B,p,w,c,sol,t);
 		sol[i] = 0;
 	}
-	
+	*/
 	return false;
 }
 
 int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k){
 	
-	if(k == n){
+/*	if(k == n){
 		return checkSolution(sol, p, w, c, B, d);	
 	}
 	
@@ -85,8 +107,11 @@ int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &
 		
 	solAux[k] = 1;
 	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  );
-
+	*/
+	return 1;
 }
+
+
 
 ///
 // Branch and Bound function
