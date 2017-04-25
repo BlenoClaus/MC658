@@ -46,22 +46,28 @@ int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, 
 	else return -1;
 }
 
-void backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k, vector<int> temp){
-	
-	if(k < n){
-		temp[k] = 1;
-		int n = checkSolution(temp, p, w, c, B, d);
-		if(n > 0){
-			if(n > currentP){
-				currentP = n;
-				currentSol = temp;
-			}
-			backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
-		}
-		temp[k] = 0;
-		backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
+void printVector(vector<int> v){
+	for(int i = 0; i < v.size(); i++){
+		cout << v[i] << " ";
 	}
-	
+	cout << endl;
+}
+
+void bt_solution(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k,  int &curBstValue, vector<int> &curBstSol){
+
+	if ( k < n){
+		int solTemp = checkSolution(sol, p, w, c, B, d);
+		if ( solTemp > -1){
+			if ( solTemp > curBstValue){
+				curBstValue = solTemp;
+				curBstSol = sol;
+			}		
+			sol[k] = 0;
+			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
+			sol[k] = 1;
+			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
+		}
+	}
 }
 
 ///
@@ -76,11 +82,33 @@ bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vec
 	sol = currentSol;
 	return true;
 	
+	
+	bt_solution(n, d, B, p, w, c, sol, t, 0, curBstValue, curBstSol);
+	
+	//sol = curBstValue;
+	
+	/*for(int i = 0; i < n; i++){
+		sol[i] = 1;
+		int aux = checkSolution(sol, w, c, B, d);
+		if(aux > -1){
+		  	if(aux > curBstSol){
+				curBstValue = aux;
+				curBstSol = sol;
+			}
+		} else {
+			sol[i] = 0;
+			continue;			
+		}
+		bt(n,d,B,p,w,c,sol,t);
+		sol[i] = 0;
+	}
+	*/
+	return false;
 }
 
-
-/*
-if(k == n){
+int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k){
+	
+/*	if(k == n){
 		return checkSolution(sol, p, w, c, B, d);	
 	}
 	
@@ -94,7 +122,12 @@ if(k == n){
 	}
 		
 	solAux[k] = 1;
-	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  ); */
+	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  );
+	*/
+	return 1;
+}
+
+
 
 ///
 // Branch and Bound function
