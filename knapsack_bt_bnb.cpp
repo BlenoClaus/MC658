@@ -11,10 +11,23 @@
 // Nome2: Bleno Humberto Claus
 // RA2: 145444
 
+vector<int> currentSol;
+int currentP = 0;
+
+void printVector(vector<int> v){
+	for(int i = 0; i < v.size(); i++){
+		cout << v[i] << " ";
+	}
+	cout << endl;
+}
+
 int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, int B, int d){
 	
 	int banda = 0, nclasses = 0, pgto = 0;
-	vector<int> classes(10000, 0);
+	vector<int> classes(1000, 0);
+	
+	cout << "Checking solution: ";
+	printVector(sol);
 	
 	for(int i = 0; i < sol.size(); i++){
 		if(sol[i] == 1){
@@ -33,11 +46,22 @@ int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, 
 	else return -1;
 }
 
-void printVector(vector<int> v){
-	for(int i = 0; i < v.size(); i++){
-		cout << v[i] << " ";
+void backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k, vector<int> temp){
+	
+	if(k < n){
+		temp[k] = 1;
+		int n = checkSolution(temp, p, w, c, B, d);
+		if(n > 0){
+			if(n > currentP){
+				currentP = n;
+				currentSol = temp;
+			}
+			backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
+		}
+		temp[k] = 0;
+		backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
 	}
-	cout << endl;
+	
 }
 
 ///
@@ -45,32 +69,18 @@ void printVector(vector<int> v){
 ///
 bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t){
 	
-	int curBstValue = 0;
-	vector<int> curBstSol(sol.size(), 0);
 	fill(sol.begin(), sol.end(), 0);
+	vector<int> temp = sol;
+	currentSol = temp;
+	backtrack(n, d, B, p, w, c, sol, t, 0, temp);
+	sol = currentSol;
+	return true;
 	
-	for(int i = 0; i < n; i++){
-		sol[i] = 1;
-		int aux = checkSolution(sol, w, c, B, d);
-		if(aux > -1){
-		  	if(aux > curBstSol){
-				curBstValue = aux;
-				curBstSol = sol;
-			}
-		} else {
-			sol[i] = 0;
-			continue;			
-		}
-		bt(n,d,B,p,w,c,sol,t);
-		sol[i] = 0;
-	}
-	
-	return false;
 }
 
-int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k){
-	
-	if(k == n){
+
+/*
+if(k == n){
 		return checkSolution(sol, p, w, c, B, d);	
 	}
 	
@@ -84,9 +94,7 @@ int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &
 	}
 		
 	solAux[k] = 1;
-	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  );
-
-}
+	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  ); */
 
 ///
 // Branch and Bound function
