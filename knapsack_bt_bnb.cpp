@@ -4,6 +4,7 @@
  * PED: Edson Ticona Zegarra
  ******************************************************/
 #include "knapsack.h"
+#include <time.h>
 
 ///Preencher aqui para facilitar a correcao. 
 // Nome1: Daniel Ricci
@@ -13,6 +14,9 @@
 
 vector<int> currentSol;
 int currentP = 0;
+int startTime;
+int currentTime;
+bool stop = false;
 
 void printVector(vector<int> v){
 	for(int i = 0; i < v.size(); i++){
@@ -26,8 +30,8 @@ int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, 
 	int banda = 0, nclasses = 0, pgto = 0;
 	vector<int> classes(1000, 0);
 	
-	cout << "Checking solution: ";
-	printVector(sol);
+	//cout << "Checking solution: ";
+	//printVector(sol);
 	
 	for(int i = 0; i < sol.size(); i++){
 		if(sol[i] == 1){
@@ -46,28 +50,29 @@ int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, 
 	else return -1;
 }
 
-void printVector(vector<int> v){
-	for(int i = 0; i < v.size(); i++){
-		cout << v[i] << " ";
+void backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k, vector<int> temp){
+	
+	currentTime = time(0);
+	double time = difftime(currentTime, startTime);
+	
+	if(time >= t){
+		stop = true;
 	}
-	cout << endl;
-}
-
-void bt_solution(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k,  int &curBstValue, vector<int> &curBstSol){
-
-	if ( k < n){
-		int solTemp = checkSolution(sol, p, w, c, B, d);
-		if ( solTemp > -1){
-			if ( solTemp > curBstValue){
-				curBstValue = solTemp;
-				curBstSol = sol;
-			}		
-			sol[k] = 0;
-			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
-			sol[k] = 1;
-			bt_solution(n, d, B, p, w, c, sol, t, k+1, curBstValue, curBstSol );
+	
+	if(k < n && !stop){
+		temp[k] = 1;
+		int aux = checkSolution(temp, p, w, c, B, d);
+		if(aux > 0){
+			if(aux > currentP){
+				currentP = aux;
+				currentSol = temp;
+			}
+			backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
 		}
+		temp[k] = 0;
+		backtrack(n, d, B, p, w, c, sol, t, k+1, temp);
 	}
+	
 }
 
 ///
@@ -75,63 +80,23 @@ void bt_solution(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int
 ///
 bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t){
 	
+	startTime = time(0);
 	fill(sol.begin(), sol.end(), 0);
 	vector<int> temp = sol;
 	currentSol = temp;
 	backtrack(n, d, B, p, w, c, sol, t, 0, temp);
 	sol = currentSol;
-	return true;
-	
-	
-	bt_solution(n, d, B, p, w, c, sol, t, 0, curBstValue, curBstSol);
-	
-	//sol = curBstValue;
-	
-	/*for(int i = 0; i < n; i++){
-		sol[i] = 1;
-		int aux = checkSolution(sol, w, c, B, d);
-		if(aux > -1){
-		  	if(aux > curBstSol){
-				curBstValue = aux;
-				curBstSol = sol;
-			}
-		} else {
-			sol[i] = 0;
-			continue;			
-		}
-		bt(n,d,B,p,w,c,sol,t);
-		sol[i] = 0;
+	if(stop){
+		cout << "Timeout! Melhor resposta encontrada: " << endl;
 	}
-	*/
-	return false;
+	return !stop;
+	
 }
-
-int backtrack(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t, int k){
-	
-/*	if(k == n){
-		return checkSolution(sol, p, w, c, B, d);	
-	}
-	
-	vector<int> solAux = sol ;	
-	int aux = checkSolution(sol, w, c, B, d);
-	if(aux > -1){
-	  	if(aux > curBstSol){
-			curBstValue = aux;
-			curBstSol = sol;
-		}
-	}
-		
-	solAux[k] = 1;
-	return max(backtrack(n, d, B, p, w, c, sol, t, k+1),backtrack(n, d, B, p, w, c, solAux, t, k+1);  );
-	*/
-	return 1;
-}
-
-
 
 ///
 // Branch and Bound function
 ///
 bool bnb(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t){
+
 	return false;
 }
