@@ -5,6 +5,7 @@
  ******************************************************/
 #include "knapsack.h"
 #include <time.h>
+#include <queue> 
 
 ///Preencher aqui para facilitar a correcao. 
 // Nome1: Daniel Ricci
@@ -18,11 +19,50 @@ int startTime;
 int currentTime;
 bool stop = false;
 
+struct User {
+	int index, classe, peso, valor ;
+};
+typedef struct User User ;
+
+struct Node {
+	int nivel, ganho, limite ;
+	double peso ;
+};
+typedef struct Node Node ;
+
+bool cmp(User u1, User u2){
+	double r1 = (double) u1.valor/u1.peso ;	
+	double r2 = (double) u2.valor/u2.peso ;
+	return r1 > r2 ;
+}
+
+void sortBy(vector<User> users){
+	sort(users.begin(), users.end(), cmp);
+}
+
 void printVector(vector<int> v){
 	for(int i = 0; i < v.size(); i++){
 		cout << v[i] << " ";
 	}
 	cout << endl;
+}
+
+int bound(Node no, int n, int w, vector<User> users){
+	if (no.peso >= w) return 0;
+	
+	int ganhoLimite = no.ganho ;
+	int j = no.nivel + 1;
+	int pesoTotal = no.peso;
+	
+	while ((j < n) && (pesoTotal + users[j].peso <= w)){
+		pesoTotal += users[j].peso;
+		ganhoLimite += users[j].valor;
+		j++;
+	}
+	
+	if (j < n) ganhoLimite += (w - pesoTotal) * users[j].valor/users[j].peso ;
+	
+	return ganhoLimite;
 }
 
 int checkSolution(vector<int> sol, vector<int> p, vector<int> w, vector<int> c, int B, int d){
@@ -89,6 +129,7 @@ bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vec
 	if(stop){
 		cout << "Timeout! Melhor resposta encontrada: " << endl;
 	}
+	cout << "Custo: " << currentP << endl;
 	return !stop;
 	
 }
@@ -97,6 +138,54 @@ bool bt(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vec
 // Branch and Bound function
 ///
 bool bnb(int n, int d, int B, vector<int> &p, vector<int> &w, vector<int> &c, vector<int> &sol, int t){
+	
+	vector<User> users ;
+	
+	for(int i = 0; i < n; i++){
+		User user;
+		user.index = i;
+		user.valor = p[i];
+		user.classe = c[i];
+		user.peso = w[i];
+		users.push_back(user);
+	}
+		
+	sortBy(users);
+	queue<Node> Q;
+    Node u, v;
+ 
+    u.nivel = -1;
+    u.ganho = u.peso = 0;
+    Q.push(u);
+
+    int maximoGanho = 0;
+    while (!Q.empty()) {
+        u = Q.front();
+        Q.pop();
+ 
+        if (u.nivel == -1) v.nivel = 0;
+        if (u.nivel == n-1) continue;
+ 
+        v.nivel = u.nivel + 1;
+        v.peso = u.peso + users[v.nivel].peso;
+        v.ganho = u.ganho + users[v.nivel].valor;
+ 
+        if (v.peso <= B && v.ganho > maximoGanho)
+            maximoGanho = v.ganho;
+ 
+        v.limite = bound(v, n, B, users);
+ 
+        if (v.limite > maximoGanho)
+            Q.push(v);
+ 
+        v.peso = u.peso;
+        v.ganho = u.ganho;
+        v.limite = bound(v, n, B, users);
+        if (v.limite > maximoGanho)
+            Q.push(v);
+    }		
+	
+	cout << maximoGanho << endl;
 
 	return false;
 }
