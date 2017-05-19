@@ -8,13 +8,12 @@
 ///Preencher aqui para facilitar a correcao. 
 // Nome1: Bleno Humberto Claus
 // RA1: 145444
-// Nome2: 
-// RA2:
+// Nome2: Kelvin Ronny Marques da Silva 
+// RA2: 138645
 
 ///
 // PL function
 ///
-			//ListBpGraph::Node adjNode = g.target(e);	
 
 bool pl(ListBpGraph& g, ListBpGraph::EdgeMap<int> &c, ListBpGraph::NodeMap<int> &v, ListBpGraph::EdgeMap<int> &sol, int tMax){
 	GRBEnv env = GRBEnv();
@@ -22,7 +21,7 @@ bool pl(ListBpGraph& g, ListBpGraph::EdgeMap<int> &c, ListBpGraph::NodeMap<int> 
 	model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
 	env.set(GRB_DoubleParam_TimeLimit, tMax);	
 	
-	/*ListBpGraph::EdgeMap<GRBVar> x(g);
+	ListBpGraph::EdgeMap<GRBVar> x(g);
 	for (ListBpGraph::EdgeIt eb(g); eb!=INVALID; ++eb){
 		x[eb] = model.addVar(0.0, GRB_INFINITY, c[eb], GRB_CONTINUOUS, "x");
 	}	
@@ -55,6 +54,5 @@ bool pl(ListBpGraph& g, ListBpGraph::EdgeMap<int> &c, ListBpGraph::NodeMap<int> 
 	for (ListBpGraph::EdgeIt eb(g); eb!=INVALID; ++eb){
 		sol[eb] = x[eb].get(GRB_DoubleAttr_X);
 	}
-	*/
 	return true;
 }
