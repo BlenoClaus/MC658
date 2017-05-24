@@ -47,12 +47,17 @@ bool pl(ListBpGraph& g, ListBpGraph::EdgeMap<int> &c, ListBpGraph::NodeMap<int> 
 	
 	try {
 	    model.optimize(); 
+		for (ListBpGraph::EdgeIt eb(g); eb!=INVALID; ++eb){
+			sol[eb] = x[eb].get(GRB_DoubleAttr_X);
+		}
 	} catch(GRBException e)	{
 		cerr << e.getMessage();
+		for (ListBpGraph::EdgeIt eb(g); eb!=INVALID; ++eb){
+			sol[eb] = x[eb].get(GRB_DoubleAttr_X);
+		}
+		return false;
 	}
 
-	for (ListBpGraph::EdgeIt eb(g); eb!=INVALID; ++eb){
-		sol[eb] = x[eb].get(GRB_DoubleAttr_X);
-	}
+
 	return true;
 }
